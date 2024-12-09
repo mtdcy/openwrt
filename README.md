@@ -1,3 +1,31 @@
+
+## Merge Fullcone NAT from immortalwrt
+
+```shell
+git remote add immortalwrt https://github.com/immortalwrt/immortalwrt.git
+git checkout immortalwrt/master -- \
+    package/network/utils/fullconenat \
+    package/network/utils/fullconenat-nft \
+    package/network/config/firewall/patches/fullconenat.patch \
+    package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch \
+    package/network/utils/nftables/patches/002-nftables-add-fullcone-expression-support.patch \
+    package/libs/libnftnl/patches/001-libnftnl-add-fullcone-expression-support.patch
+
+git commit -m "add fullconenat/fullconenat-nft and patches"
+
+# firewall
+git cherry-pick 1fdc170161
+
+# firewall4
+git cherry-pick ae33beb603
+git checkout --ours package/network/config/firewall4/patches/001-firewall4-add-support-for-fullcone-nat.patch
+
+# libnftnl
+git cherry-pick e0f49e1d54
+```
+
+---
+
 ![OpenWrt logo](include/logo.png)
 
 OpenWrt Project is a Linux operating system targeting embedded devices. Instead
