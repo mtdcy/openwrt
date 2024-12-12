@@ -1,0 +1,64 @@
+#!/bin/bash
+
+CONFIG_PACKAGES=(
+    # base
+    firewall firewall4=n
+    dnsmasq=n dnsmasq-full dnsmasq_full_ipset dnsmasq_full_nftset=n
+
+    # admin
+    htop
+
+    # utils
+    bash vim-full=n vim-fuller zsh
+    procps-ng procps-ng-ps procps-ng-kill procps-ng-pgrep procps-ng-pkill
+    coreutils coreutils-cp coreutils-ln coreutils-ls coreutils-numfmt coreutils-realpath
+    grep file tree findutils gawk sed less more
+    parted losetup resize2fs
+    pciutils usbutils open-vm-tools qemu-ga=m
+    # qemu-ga conflicts with open-vm-tools
+
+    # network
+    iptables-nft ip6tables-nft xtables-nft
+    ip-full ip-bridge bind-dig bind-host bind-nslookup ss
+    ipset tc-full nmap-full tcpdump conntrack
+    wget-ssl curl rsync git-http
+    dropbear=n openssh-keygen openssh-server openssh-sftp-server
+    uhttpd=n nginx-full luci-nginx iperf3-ssl miniupnpd-iptables
+    hostapd wpa-supplicant iw-full iwinfo
+    # select firmwares with menuconfig
+
+    # docker
+    docker docker-compose dockerd
+    CONFIG_DOCKER_CGROUP_OPTIONS
+    CONFIG_DOCKER_OPTIONAL_FEATURES
+    CONFIG_DOCKER_NET_OVERLAY
+    CONFIG_DOCKER_NET_MACVLAN
+
+    # app
+    luci-app-diskman
+    luci-app-dockerman
+    luci-app-sshtunnel
+    luci-app-ddns
+    luci-app-ttyd
+    luci-app-upnp
+    luci-app-nlbwmon luci-app-vnstat2
+    luci-app-qos luci-app-sqm
+    luci-app-samba4 luci-app-nfs luci-app-rclone
+    adguardhome luci-app-adguardhome
+
+    # others
+    python3 python3-pip python3-venv
+
+    luci-theme-bootstrap=n
+    luci-theme-edge
+    luci-theme-argon=m
+    luci-app-nginx
+)
+
+# name;url[;branch]
+EXTERNAL_PACKAGES=(
+    "luci-theme-edge;https://git.mtdcy.top/mtdcy/gh-luci-theme-edge.git"
+    "luci-theme-argon;https://git.mtdcy.top/mtdcy/gh-luci-theme-argon.git;master"
+    "luci-app-adguardhome;https://git.mtdcy.top/mtdcy/gh-luci-app-adguardhome.git"
+    "luci-app-nginx;https://git.mtdcy.top:8443/mtdcy/gh-luci-app-nginx.git"
+)

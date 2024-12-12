@@ -1,0 +1,2 @@
+x86_64;https://mirrors.mtdcy.top/openwrt/releases/23.05.5/targets/x86/64/openwrt-toolchain-23.05.5-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+aarch64_generic;https://mirrors.mtdcy.top/openwrt/releases/23.05.5/targets/rockchip/armv8/openwrt-toolchain-23.05.5-rockchip-armv8_gcc-12.3.0_musl.Linux-x86_64.tar.xz

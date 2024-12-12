@@ -1,0 +1,58 @@
+diff --git a/scripts/projectsmirrors.json b/scripts/projectsmirrors.json
+index 9bc2d7ac10..d247defaab 100644
+--- a/scripts/projectsmirrors.json
++++ b/scripts/projectsmirrors.json
+@@ -1,13 +1,15 @@
+ {
+ 	"@SF": [
+-		"https://downloads.sourceforge.net"
++		"https://downloads.sourceforge.net",
++        "https://mirrors.mtdcy.top/sourceforge"
+ 	],
+ 	"@DEBIAN": [
+ 		"https://ftp.debian.org/debian",
+ 		"https://mirror.leaseweb.com/debian",
+ 		"https://mirror.netcologne.de/debian",
+ 		"https://mirrors.tuna.tsinghua.edu.cn/debian",
+-		"https://mirrors.ustc.edu.cn/debian"
++		"https://mirrors.ustc.edu.cn/debian",
++        "https://mirrors.mtdcy.top/debian"
+ 	],
+ 	"@APACHE": [
+ 		"https://dlcdn.apache.org",
+@@ -35,7 +37,8 @@
+ 		"https://mirrors.rit.edu/gnu",
+ 		"https://ftp.gnu.org/gnu",
+ 		"https://mirrors.tuna.tsinghua.edu.cn/gnu",
+-		"https://mirrors.ustc.edu.cn/gnu"
++		"https://mirrors.ustc.edu.cn/gnu",
++        "https://mirrors.mtdcy.top/gnu"
+ 	],
+ 	"@SAVANNAH": [
+ 		"https://download.savannah.nongnu.org/releases",
+@@ -52,7 +55,8 @@
+ 		"http://www.ring.gr.jp/archives/linux/kernel.org",
+ 		"https://ftp.riken.jp/Linux/kernel.org",
+ 		"https://www.mirrorservice.org/sites/ftp.kernel.org/pub",
+-		"https://mirrors.ustc.edu.cn/kernel.org"
++		"https://mirrors.ustc.edu.cn/kernel.org",
++        "https://mirrors.mtdcy.top/kernel"
+ 	],
+ 	"@GNOME": [
+ 		"https://download.gnome.org/sources",
+@@ -60,11 +64,13 @@
+ 		"https://ftp.acc.umu.se/pub/GNOME/sources",
+ 		"http://ftp.cse.buffalo.edu/pub/Gnome/sources",
+ 		"http://ftp.nara.wide.ad.jp/pub/X11/GNOME/sources",
+-		"https://mirrors.ustc.edu.cn/gnome/sources"
++		"https://mirrors.ustc.edu.cn/gnome/sources",
++        "https://mirrors.mtdcy.top/gnome"
+ 	],
+ 	"@OPENWRT": [
+ 		"https://sources.cdn.openwrt.org",
+ 		"https://sources.openwrt.org",
+-		"https://mirror2.openwrt.org/sources"
++		"https://mirror2.openwrt.org/sources",
++        "https://mirrors.mtdcy.top/openwrt"
+ 	]
+ }

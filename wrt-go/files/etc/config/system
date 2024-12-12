@@ -1,0 +1,18 @@
+config system
+        option hostname 'Wrt-Go'
+        option ttylogin '0'
+        option log_size '64'
+        option urandom_seed '0'
+        option timezone 'CST-8'
+        option zonename 'Asia/Shanghai'
+        option log_proto 'udp'
+        option conloglevel '8'
+        option cronloglevel '5'
+        option log_size '262144'
+        option log_file '/var/log/system.log'
+
+config timeserver 'ntp'
+        list server 'cn.ntp.org.cn'
+        list server 'ntp.ntsc.ac.cn'
+        list server 'ntp1.aliyun.com'
+        option enable_server '1'

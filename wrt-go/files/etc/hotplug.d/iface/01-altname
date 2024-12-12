@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ "$ACTION" = ifup ] || [ "$ACTION" = ifupdate ] || exit 0
+
+case "$INTERFACE" in
+    lan|LAN)
+        # someone hardcoded br-lan to source code
+        [ "$DEVICE" = "br-lan" ] || ip link property add dev "$DEVICE" altname br-lan
+
+        # secondary ip
+        ip addr add 172.31.100.1/24 brd + dev "$DEVICE" || true
+        ;;
+esac
