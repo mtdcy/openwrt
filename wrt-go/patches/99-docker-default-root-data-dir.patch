@@ -1,0 +1,52 @@
+diff --git a/feeds/packages/utils/dockerd/Makefile b/feeds/packages/utils/dockerd/Makefile
+index 48fab58..c6fc28a 100644
+--- a/feeds/packages/utils/dockerd/Makefile
++++ b/feeds/packages/utils/dockerd/Makefile
+@@ -142,7 +142,7 @@ define Package/dockerd/install
+ 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bundles/binary-daemon/dockerd $(1)/usr/bin/
+ 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bundles/binary-daemon/docker-proxy $(1)/usr/bin/
+
+-	$(INSTALL_DIR) $(1)/opt/docker/
++	$(INSTALL_DIR) $(1)/var/lib/docker/
+
+   ifeq ($(CONFIG_DOCKER_CHECK_CONFIG),y)
+ 	$(INSTALL_DIR) $(1)/usr/share/docker/
+diff --git a/feeds/packages/utils/dockerd/files/dockerd.init b/feeds/packages/utils/dockerd/files/dockerd.init
+index 5188937..024d993 100755
+--- a/feeds/packages/utils/dockerd/files/dockerd.init
++++ b/feeds/packages/utils/dockerd/files/dockerd.init
+@@ -169,7 +169,7 @@ process_config() {
+ 		return 0
+ 	}
+
+-	config_get data_root globals data_root "/opt/docker/"
++	config_get data_root globals data_root "/var/lib/docker/"
+ 	config_get log_level globals log_level "warn"
+ 	config_get_bool iptables globals iptables "1"
+ 	config_get_bool ip6tables globals ip6tables "0"
+diff --git a/feeds/packages/utils/dockerd/files/etc/config/dockerd b/feeds/packages/utils/dockerd/files/etc/config/dockerd
+index e3fde7c..b400fa5 100644
+--- a/feeds/packages/utils/dockerd/files/etc/config/dockerd
++++ b/feeds/packages/utils/dockerd/files/etc/config/dockerd
+@@ -7,7 +7,7 @@
+
+ config globals 'globals'
+ #	option alt_config_file '/etc/docker/daemon.json'
+-	option data_root '/opt/docker/'
++	option data_root '/var/lib/docker/'
+ #	option log_driver 'local'
+ 	option log_level 'warn'
+ 	option iptables '1'
+diff --git a/feeds/luci/applications/luci-app-dockerman/luasrc/model/cbi/dockerman/configuration.lua b/feeds/luci/applications/luci-app-dockerman/luasrc/model/cbi/dockerman/configuration.lua
+index 6fd831d..186eda3 100644
+--- a/feeds/luci/applications/luci-app-dockerman/luasrc/model/cbi/dockerman/configuration.lua
++++ b/feeds/luci/applications/luci-app-dockerman/luasrc/model/cbi/dockerman/configuration.lua
+@@ -34,7 +34,7 @@ o:depends("remote_endpoint", 1)
+ if nixio.fs.access("/usr/bin/dockerd") then
+ 	o = s:option(Value, "data_root",
+ 		translate("Docker Root Dir"))
+-	o.placeholder = "/opt/docker/"
++	o.placeholder = "/var/lib/docker/"
+ 	o:depends("remote_endpoint", 0)
+ 
+ 	o = s:option(Value, "bip",

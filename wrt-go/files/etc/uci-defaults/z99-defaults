@@ -1,0 +1,176 @@
+#!/bin/sh
+# default optimized configs
+
+. /lib/functions/network.sh
+
+# system
+uci -q batch << EOI
+    set system.@system[0].hostname='Wrt-Go'
+    set system.@system[0].timezone='CST-8'
+    set system.@system[0].zonename='Asia/Shanghai'
+    set system.@system[0].log_size='262144' # 256M
+    set system.@system[0].log_file='/var/log/system.log'
+
+    set system.ntp=timeserver
+    set system.ntp.enable_server='1'
+    del system.ntp.server
+
+    add_list system.ntp.server='cn.ntp.org.cn'
+    add_list system.ntp.server='ntp.ntsc.ac.cn'
+    add_list system.ntp.server='ntp1.aliyun.com'
+
+    commit system
+EOI
+
+# default lang & theme
+if [ -e /www/luci-static/edge ]; then
+    uci -q batch << EOI
+        set luci.main.lang='zh_cn'
+        set luci.languages.zh_cn='简体中文'
+        set luci.main.mediaurlbase='/luci-static/edge'
+        set luci.themes.Edge='/luci-static/edge'
+
+        commit luci
+EOI
+fi
+
+
+# network: set lan to dhcp with secondary static ip
+#  @see /etc/hotplug.d/iface/01-altname
+uci -q batch << EOI
+    set network.wan.proto='dhcp'
+    set network.lan.proto='dhcp'
+
+    commit network
+EOI
+
+
+# dnsmasq
+# !!! should put this to config
+sed -e 's%/tmp/hosts/dhcp%/var/hosts/dhcp%' \
+    -i /etc/init.d/dnsmasq
+
+if uci get dhcp; then
+    uci -q batch << EOI
+        set dhcp.@dnsmasq[0].local='/local/'
+        set dhcp.@dnsmasq[0].domain='local'
+        set dhcp.@dnsmasq[0].leasefile='/var/dhcp.lease'
+        set dhcp.@dnsmasq[0].localise_queries='1'
+        set dhcp.@dnsmasq[0].expandhosts='1'
+        set dhcp.@dnsmasq[0].nonegcache='1'
+        set dhcp.@dnsmasq[0].addnhosts='/var/hosts/odhcpd'
+        set dhcp.@dnsmasq[0].authoritative='0'
+        set dhcp.@dnsmasq[0].dns_redirect='0'
+
+        rename dhcp.@dnsmasq[0]='main'
+
+        set dhcp.odhcpd.leasefile='/var/hosts/odhcpd'
+
+        commit dhcp
+EOI
+fi
+
+# sshd
+if [ -e /etc/init.d/sshd ]; then
+    mkdir -p /root/.ssh
+    # may need ssh access for first bootup
+    sed -e 's/#PermitRootLogin .*$/PermitRootLogin yes/' \
+        -e 's/#PermitEmptyPasswords .*$/PermitEmptyPasswords yes/' \
+        -i /etc/ssh/sshd_config
+fi
+
+# docker
+if uci get dockerd; then
+    uci -q batch << EOI
+        set dockerd.globals.auto_start='1'
+
+        # no need to setup firewall => cause start failed
+        #set dockerd.globals.iptables='1'
+        set dockerd.globals.bip='172.30.0.1/16'
+        set dockerd.globals.data_root='/var/lib/docker/'
+        set dockerd.dockerman.socket_path='/var/run/docker.sock'
+
+        commit dockerd
+EOI
+
+    if ! uci get network.docker; then
+        uci -q batch << EOI
+            set network.docker=interface
+            set network.docker.device='docker0'
+            set network.docker.proto='none'
+            set network.docker.auto='0'
+
+            commit network
+EOI
+    fi
+fi
+
+# firewall
+if ! uci get firewall.docker; then
+    uci -q batch << EOI
+        set firewall.docker=zone
+        set firewall.docker.name='docker'
+        set firewall.docker.network='docker'
+
+        set firewall.docker.input='ACCEPT'
+        set firewall.docker.output='ACCEPT'
+        set firewall.docker.forward='ACCEPT'
+
+        # lan => docker
+        add firewall forwarding
+        set firewall.@forwarding[-1].src='lan'
+        set firewall.@forwarding[-1].dest='docker'
+
+        # docker => lan
+        add firewall forwarding
+        set firewall.@forwarding[-1].src='docker'
+        set firewall.@forwarding[-1].dest='lan'
+
+        # docker => wan
+        add firewall forwarding
+        set firewall.@forwarding[-1].src='docker'
+        set firewall.@forwarding[-1].dest='wan'
+
+        commit firewall
+EOI
+fi
+
+# nginx - default @ 8080, no ssl
+#   => ttyd works
+if uci get nginx; then
+    uci -q batch << EOI
+        delete nginx._lan
+        delete nginx._redirect2ssl
+
+        delete nginx.luci
+        set nginx.luci='server'
+        set nginx.luci.server_name='_'
+        add_list nginx.luci.listen='8080 default_server'
+        add_list nginx.luci.include='conf.d/luci.locations'
+
+        commit nginx
+EOI
+fi
+
+# ttyd: at least needs to listen to localhost
+#   => it seems like a bug.
+if uci get ttyd; then
+    uci -eq batch << EOI
+        del ttyd.@ttyd[0].interface
+
+        commit ttyd
+EOI
+fi
+
+# XXX: setup distfeeds.conf here???
+
+# vnstat
+if uci get vnstat; then
+    uci del vnstat.@vnstat[0].interface
+    for dev in $(uci get network.wan.device) $(uci get network.lan.device); do
+        uci add_list vnstat.@vnstat[0].interface="$dev"
+    done
+    uci commit vnstat
+fi
+
+exit 0
