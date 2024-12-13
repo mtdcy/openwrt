@@ -1,8 +1,14 @@
 #!/bin/bash
 
 CONFIG_PACKAGES=(
+    # firewall: disable legacy and enable nft explictly
+    #  => we prefer to use iptables userspace tools with nftables api
+    iptables-zz-legacy=n ip6tables-zz-legacy=n
+    xtables-legacy=n arptables-legacy=n ebtables-legacy=n
+    iptables-nft ip6tables-nft xtables-nft arptables-nft ebtables-nft
+    firewall firewall4=n nftables-json
+
     # base
-    firewall firewall4=n
     dnsmasq=n dnsmasq-full dnsmasq_full_ipset dnsmasq_full_nftset=n
 
     # admin
@@ -17,8 +23,7 @@ CONFIG_PACKAGES=(
     pciutils usbutils open-vm-tools qemu-ga=m
     # qemu-ga conflicts with open-vm-tools
 
-    # network
-    iptables-nft ip6tables-nft xtables-nft
+    # network:
     ip-full ip-bridge bind-dig bind-host bind-nslookup ss
     ipset tc-full nmap-full tcpdump conntrack
     wget-ssl curl rsync git-http

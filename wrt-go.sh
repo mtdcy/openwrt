@@ -46,6 +46,20 @@ branch_tag_name() {
         | sed -e 's/openwrt-//' -e 's/^v//'
 }
 
+version_name() {
+    local name
+    # tag name
+    name=$(git describe --tags --exact-match 2>/dev/null | sed 's/^v//')
+    # branch name
+    [ -n "$name" ] || {
+        name=$(git symbolic-ref -q --short HEAD 2>/dev/null | sed 's/openwrt-//')
+    }
+    # revision hash
+    [ -n "$name" ] || name=$(git rev-parse --short HEAD 2>/dev/null)
+
+    echo "$name-$(date '+%y%m%d')"
+}
+
 # prepare_docker_image <version>
 prepare_docker_image() {
     if [ -z "$(docker images -q "$IMAGE:$1" 2>/dev/null)" ]; then
@@ -176,7 +190,9 @@ filter_out_apps() {
     # remove all packages
     sed -e '/CONFIG_PACKAGE_luci-app-.*$/d' \
         -e '/CONFIG_PACKAGE_luci-i18n-.*$/d' \
-        -e '/CONFIG_LUCI_LANG_.*$/d'
+        -e '/CONFIG_LUCI_LANG_.*$/d' \
+        -e '/tables-zz-legacy/d' \
+        -e '/tables-legacy/d'
 }
 
 # prepare_config [target]
@@ -264,6 +280,8 @@ EOF
 CONFIG_IMAGEOPT=y
 CONFIG_VERSIONOPT=y
 CONFIG_VERSION_DIST="Wrt-Go"
+CONFIG_VERSION_NUMBER="$(version_name)"
+CONFIG_VERSION_CODE=""
 CONFIG_VERSION_HOME_URL="https://wrt-go.mtdcy.top"
 CONFIG_VERSION_REPO="https://wrt-go.mtdcy.top/releases/$(branch_tag_name)"
 EOF
